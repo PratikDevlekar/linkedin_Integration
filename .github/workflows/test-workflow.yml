@@ -21,7 +21,7 @@ jobs:
           ignore-unfixed: true
           format: table
           output: trivy-results.json
-          severity: CRITICAL
+          severity: CRITICAL,HIGH,MEDIUM,LOW
 
       - name : Get the scan result as Json format
         uses: aquasecurity/trivy-action@master
