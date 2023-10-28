@@ -1,0 +1,117 @@
+name: vulnerablility scanning 
+  on:
+    # Workflow triggers when a tag of given pattern is pushed
+    push:
+      tags:
+        - v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+
+        - v[0-9]+.[0-9]+.[0-9]+
+  
+  jobs:
+    vulnerability-scan:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code 
+          uses: actions/checkout@v3
+
+        - name: Run Trivy vulnerability scanner in repo mode
+          uses: aquasecurity/trivy-action@master
+          with:
+            scan-type: fs
+            ignore-unfixed: true
+            format: table
+            output: trivy-results.json
+            severity: CRITICAL
+
+        - name : Get the scan result as Json format
+          uses: aquasecurity/trivy-action@master
+          with:
+            scan-type: fs
+            ignore-unfixed: true
+            format: json
+            output: trivy-results-json-format.json
+            severity: CRITICAL,HIGH
+
+        - name: Upload Trivy scan results as an artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: trivy-results
+            path: ${{ github.workspace }}/trivy-results.json
+
+        - name: Upload Json formated result   
+          uses: actions/upload-artifact@v2 
+          with:
+            name: Json Format
+            path: ${{ github.workspace }}/trivy-results-json-format.json
+
+        - name: Extract High and Critical Vulnerabilities
+          id: extract-vulnerabilities
+          run: |
+            trivy_results=$(cat trivy-results-json-format.json)
+            vulnerabilities=$(echo "$trivy_results" | jq -r '.Results[0].Vulnerabilities[] | select(.Severity | test("CRITICAL|HIGH")) |"<tr><td><b>\(.VulnerabilityID)</b></td><td>\(.Severity)</td><td>\(.PkgName)</td><td>\(.Description | gsub("\n"; "<br>"))</td></tr>"')
+            { echo "vulnerabilities<<EOF" 
+              echo "$vulnerabilities" 
+              echo "EOF" 
+            } >> "$GITHUB_OUTPUT"
+
+        - name: Send mail
+          uses: dawidd6/action-send-mail@v3
+          with:
+            server_address: ${{secrets.SMTP_HOST}}
+            server_port: ${{secrets.SMTP_PORT}}
+            username: ${{secrets.SMTP_USER}}
+            password: ${{secrets.SMTP_PASS}}
+            subject: Results of vulnerability scan 
+            to: pratikdevlekar64@gmail.com
+            from: ${{secrets.SENDER_EMAIL}}
+            body: Build job of ${{github.repository}} completed successfully!
+            html_body: |
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>GitHub Actions Email</title>
+                <style>
+                table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                }
+                td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+                }
+                tr:nth-child(even) {
+                background-color: #dddddd;
+                }
+              </style>
+              </head>
+              <body>
+                <h2>GitHub Actions Notification</h2>
+                <p>This is a notification email from a GitHub Actions workflow.</p>
+                <h3>Repository Information:</h3>
+                  <ul>
+                    <li><b>Repository Name:</b> ${{github.event.repository.name}}</li>
+                    <li><b>Tag:</b> ${{github.ref_name}}</li>
+                  </ul>
+                <h3>Vulnerability Scan Results:</h3>
+                <p>Here are the results of the vulnerability scan which are Critical and High on severity:</p>
+                <ul>
+                  <table>
+                    <tr>
+                      <th> Vulnerablility </th>
+                      <th> Severity </th>
+                      <th> Library </th>
+                      <th> Description </th>
+                    </tr>
+                    ${{ steps.extract-vulnerabilities.outputs.vulnerabilities}}
+                  </table>
+                </ul>
+                <p>For the complete report on the vulnerability scan, please refer to the attachment.</p>
+                <p>And take appropriate action to address these vulnerabilities. Also make sure to use this latest image tag for your deployments to ensure you are using the most up-to-date and secure version.<br></p>
+              </body>
+              </html>
+            cc: Pdevlekar@itrnetwork.com
+            ignore_cert: true
+            convert_markdown: true
+            attachments: trivy-results.json
+            priority: normal
