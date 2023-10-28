@@ -46,8 +46,6 @@ jobs:
 
       - name: Send "No Vulnerabilities" mail
         if: steps.extract-vulnerabilities.outputs.vulnerabilities == ''
-        run: |
-          echo "No vulnerabilities were found in the code scan."
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{secrets.SMTP_HOST}}
@@ -58,6 +56,32 @@ jobs:
           to: pratikdevlekar64@gmail.com
           from: ${{secrets.SENDER_EMAIL}}
           body: No vulnerabilities were found in the code scan.
+          html_body: |
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>GitHub Actions Email</title>
+              <style>
+              table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+              }
+              td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+              }
+              tr:nth-child(even) {
+              background-color: #dddddd;
+              }
+            </style>
+            </head>
+            <body>
+              <h2>GitHub Actions Notification</h2>
+              <p>This is a notification email from a GitHub Actions workflow.</p>
+            </body>
+            </html>
           priority: normal
 
       - name: Extract High and Critical Vulnerabilities
