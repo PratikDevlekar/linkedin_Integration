@@ -44,6 +44,22 @@ jobs:
           name: Json Format
           path: ${{ github.workspace }}/trivy-results-json-format.json
 
+      - name: Send "No Vulnerabilities" mail
+        if: steps.extract-vulnerabilities.outputs.vulnerabilities == ''
+        run: |
+          echo "No vulnerabilities were found in the code scan."
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{secrets.SMTP_HOST}}
+          server_port: ${{secrets.SMTP_PORT}}
+          username: ${{secrets.SMTP_USER}}
+          password: ${{secrets.SMTP_PASS}}
+          subject: No Vulnerabilities Found
+          to: pratikdevlekar64@gmail.com
+          from: ${{secrets.SENDER_EMAIL}}
+          body: No vulnerabilities were found in the code scan.
+          priority: normal
+
       - name: Extract High and Critical Vulnerabilities
         id: extract-vulnerabilities
         run: |
