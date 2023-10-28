@@ -48,13 +48,13 @@ jobs:
         if: steps.extract-vulnerabilities.outputs.vulnerabilities == ''
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{secrets.SMTP_HOST}}
-          server_port: ${{secrets.SMTP_PORT}}
-          username: ${{secrets.SMTP_USER}}
-          password: ${{secrets.SMTP_PASS}}
+          server_address: smtp.office365.com
+          server_port: 587
+          username: noreply@itrnetwork.com
+          password: C@lance22
           subject: No Vulnerabilities Found
           to: pratikdevlekar64@gmail.com
-          from: ${{secrets.SENDER_EMAIL}}
+          from: noreply@calance.com
           body: No vulnerabilities were found in the code scan.
           html_body: |
             <!DOCTYPE html>
@@ -97,13 +97,13 @@ jobs:
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{secrets.SMTP_HOST}}
-          server_port: ${{secrets.SMTP_PORT}}
-          username: ${{secrets.SMTP_USER}}
-          password: ${{secrets.SMTP_PASS}}
+          server_address: smtp.office365.com
+          server_port: 587
+          username: noreply@itrnetwork.com
+          password: C@lance22
           subject: Results of vulnerability scan 
           to: pratikdevlekar64@gmail.com
-          from: ${{secrets.SENDER_EMAIL}}
+          from: noreply@calance.com
           body: Build job of ${{github.repository}} completed successfully!
           html_body: |
             <!DOCTYPE html>
