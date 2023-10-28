@@ -1,5 +1,6 @@
 name: vulnerablility scanning 
-  on:
+
+on:
     # Workflow triggers when a tag of given pattern is pushed
     push:
       tags:
