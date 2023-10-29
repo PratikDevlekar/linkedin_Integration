@@ -145,4 +145,3 @@ jobs:
           ignore_cert: true
           convert_markdown: true
           attachments: trivy-results.json
-          priority: normal
