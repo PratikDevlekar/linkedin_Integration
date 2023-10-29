@@ -87,9 +87,9 @@ jobs:
   subsequent-jobs:
     needs: vulnerability-scan
     runs-on: ubuntu-latest
-    if: steps.extract-vulnerabilities.outputs.vulnerabilities != '' 
     steps:
       - name: Extract High and Critical Vulnerabilities
+        if: steps.extract-vulnerabilities.outputs.vulnerabilities != '' 
         id: extract-vulnerabilities
         run: |
           trivy_results=$(cat trivy-results-json-format.json)
@@ -99,6 +99,7 @@ jobs:
             echo "EOF" 
           } >> "$GITHUB_OUTPUT"
       - name: Send mail
+        if: steps.extract-vulnerabilities.outputs.vulnerabilities != '' 
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.office365.com
