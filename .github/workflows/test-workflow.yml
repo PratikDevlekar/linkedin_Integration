@@ -44,42 +44,28 @@ jobs:
           name: Json Format
           path: ${{ github.workspace }}/trivy-results-json-format.json
 
-      - name: Send "No Vulnerabilities" mail
+      - name: Send No Vulnerabilities mail
         if: steps.extract-vulnerabilities.outputs.vulnerabilities == ''
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.office365.com
-          server_port: 587
-          username: noreply@itrnetwork.com
-          password: C@lance22
-          subject: No Vulnerabilities Found
-          to: pratikdevlekar64@gmail.com
-          from: noreply@calance.com
+          server_address: ${{secrets.SMTP_HOST}}
+          server_port: ${{secrets.SMTP_PORT}}
+          username: ${{secrets.SMTP_USER}}
+          password: ${{secrets.SMTP_PASS}}
+          subject: Successful Vulnerability Scan
+          to: ${{secrets.RECEIVER_EMAIL}}
+          from: ${{secrets.SENDER_EMAIL}}
           body: No vulnerabilities were found in the code scan.
           html_body: |
             <!DOCTYPE html>
             <html>
             <head>
               <title>GitHub Actions Email</title>
-              <style>
-              table {
-              font-family: arial, sans-serif;
-              border-collapse: collapse;
-              width: 100%;
-              }
-              td, th {
-              border: 1px solid #dddddd;
-              text-align: left;
-              padding: 8px;
-              }
-              tr:nth-child(even) {
-              background-color: #dddddd;
-              }
-            </style>
             </head>
             <body>
               <h2>GitHub Actions Notification</h2>
-              <p>This is a notification email from a GitHub Actions workflow.</p>
+              <p>Great news! Our recent vulnerability scan has come back clean, with no vulnerabilities detected.</p><br>
+              <p> Our tech team is dedicated to ensuring the security of our systems. If you have any questions, feel free to reach out. </p>
             </body>
             </html>
           priority: normal
@@ -102,13 +88,13 @@ jobs:
         if: steps.extract-vulnerabilities.outputs.vulnerabilities != '' 
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.office365.com
-          server_port: 587
-          username: noreply@itrnetwork.com
-          password: C@lance22
+          server_address: ${{secrets.SMTP_HOST}}
+          server_port: ${{secrets.SMTP_PORT}}
+          username: ${{secrets.SMTP_USER}}
+          password: ${{secrets.SMTP_PASS}}
           subject: Results of vulnerability scan 
-          to: pratikdevlekar64@gmail.com
-          from: noreply@calance.com
+          to:  ${{secrets.RECEIVER_EMAIL}}
+          from: ${{secrets.SENDER_EMAIL}}
           body: Build job of ${{github.repository}} completed successfully!
           html_body: |
             <!DOCTYPE html>
@@ -152,11 +138,10 @@ jobs:
                   ${{ steps.extract-vulnerabilities.outputs.vulnerabilities}}
                 </table>
               </ul>
-              <p>For the complete report on the vulnerability scan, please refer to the attachment.</p>
-              <p>And take appropriate action to address these vulnerabilities. Also make sure to use this latest image tag for your deployments to ensure you are using the most up-to-date and secure version.<br></p>
+              <p>We kindly request that you review the attached report and take appropriate action to address vulnerabilities. Your proactive response in addressing any potential issues is vital to maintaining a secure environment.</p>
+              <p>If you require further assistance or have questions regarding the report, please don't hesitate to connect with our security team at [daft-security@eventualcomputing.com]. They will be more than happy to assist you.<br></p>
             </body>
             </html>
-          cc: Pdevlekar@itrnetwork.com
           ignore_cert: true
           convert_markdown: true
           attachments: trivy-results.json
