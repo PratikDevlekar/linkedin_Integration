@@ -87,7 +87,7 @@ jobs:
   subsequent-jobs:
     needs: vulnerability-scan
     runs-on: ubuntu-latest
-    if: ${{ steps.extract-vulnerabilities.outputs.vulnerabilities != '' }}
+    if: steps.extract-vulnerabilities.outputs.vulnerabilities != '' 
     steps:
       - name: Extract High and Critical Vulnerabilities
         id: extract-vulnerabilities
