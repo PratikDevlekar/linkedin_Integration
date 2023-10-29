@@ -84,7 +84,7 @@ jobs:
             </html>
           priority: normal
 
-subsequent-jobs:
+  subsequent-jobs:
     needs: vulnerability-scan
     runs-on: ubuntu-latest
     if: ${{ steps.extract-vulnerabilities.outputs.vulnerabilities != '' }}
