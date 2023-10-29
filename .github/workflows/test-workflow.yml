@@ -88,7 +88,7 @@ subsequent-jobs:
     needs: vulnerability-scan
     runs-on: ubuntu-latest
     if: ${{ steps.extract-vulnerabilities.outputs.vulnerabilities != '' }}
-
+    steps:
       - name: Extract High and Critical Vulnerabilities
         id: extract-vulnerabilities
         run: |
@@ -98,7 +98,6 @@ subsequent-jobs:
             echo "$vulnerabilities" 
             echo "EOF" 
           } >> "$GITHUB_OUTPUT"
-
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
         with:
